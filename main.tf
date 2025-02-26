@@ -2,6 +2,7 @@ data "aws_partition" "current" {}
 
 locals {
   partition = data.aws_partition.current.partition
+  custom_policy_name = coalesce(var.custom_policy_name, "${var.name}")
 }
 
 ################################################################################
@@ -83,8 +84,8 @@ data "aws_iam_policy_document" "assume" {
 resource "aws_iam_role" "this" {
   count = var.create ? 1 : 0
 
-  name        = var.use_name_prefix ? null : var.name
-  name_prefix = var.use_name_prefix ? "${var.name}-" : null
+  name        = var.use_name_prefix ? null : local.custom_policy_name
+  name_prefix = var.use_name_prefix ? "${local.custom_policy_name}-" : null
   path        = var.path
   description = var.description
 
